@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suivi des leads Outlook</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <h1>📨 Suivi des leads Outlook</h1>
+    <span class="badge" id="countBadge" style="background:var(--panel2)">0 leads</span>
+    <div class="spacer"></div>
+    <label class="sub" style="margin:0">Mails à scanner :</label>
+    <input id="scanCount" type="number" value="0" min="1" style="width:70px">
+    <button class="btn" id="scanBtn" onclick="scan()">🔄 Scanner Outlook</button>
+  </header>
+
+  <div class="main">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-label">Leads</span>
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Réduire">&#8249;</button>
+      </div>
+
+      <div class="filters">
+        <input type="search" id="fSearch" placeholder="Rechercher (nom, e-mail)..." oninput="render()">
+
+        <div class="mselect" id="ms-product">
+          <button class="mselect-btn" onclick="toggleMSelect('ms-product')">
+            <span class="label">Tous produits</span><span class="arrow">▾</span>
+          </button>
+          <div class="mselect-panel" id="ms-product-panel"></div>
+        </div>
+
+        <div class="mselect" id="ms-status">
+          <button class="mselect-btn" onclick="toggleMSelect('ms-status')">
+            <span class="label">Sauf ignorés</span><span class="arrow">▾</span>
+          </button>
+          <div class="mselect-panel" id="ms-status-panel"></div>
+        </div>
+
+        <div class="mselect" id="ms-quote">
+          <button class="mselect-btn" onclick="toggleMSelect('ms-quote')">
+            <span class="label">Tous</span><span class="arrow">▾</span>
+          </button>
+          <div class="mselect-panel" id="ms-quote-panel"></div>
+        </div>
+
+        <div class="mselect" id="ms-option" style="grid-column:1 / -1">
+          <button class="mselect-btn" onclick="toggleMSelect('ms-option')">
+            <span class="label">Toutes options</span><span class="arrow">▾</span>
+          </button>
+          <div class="mselect-panel" id="ms-option-panel"></div>
+        </div>
+      </div>
+
+      <div class="leadlist" id="leadlist"></div>
+    </aside>
+    <div class="sidebar-resizer" id="sidebarResizer"></div>
+
+    <section class="detail" id="detail">
+      <div class="empty">
+        <div style="font-size:40px">📭</div>
+        <div>Sélectionnez un lead, ou cliquez sur « Scanner Outlook ».</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Anthropic SDK (chargé une fois au démarrage, exposé via window._Anthropic) -->
+<script type="module">
+  import Anthropic from 'https://esm.sh/@anthropic-ai/sdk';
+  window._Anthropic = Anthropic;
+</script>
+
+<!-- Atoms : briques de base, sans dépendances -->
+<script src="/atoms/toast.js"></script>
+<script src="/atoms/badge.js"></script>
+<script src="/atoms/busy.js"></script>
+<script src="/atoms/outlook-guard.js"></script>
+
+<!-- Molecules : combinaisons d'atomes -->
+<script src="/molecules/api.js"></script>
+<script src="/molecules/mselect.js"></script>
+<script src="/molecules/lead-item.js"></script>
+
+<!-- Organisms : sections complètes (dépendent des molecules + atoms) -->
+<script src="/organisms/reply-draft.js"></script>
+<script src="/organisms/quote-panel.js"></script>
+<script src="/organisms/lead-detail.js"></script>
+
+<!-- App : state, data loading, init (dépend de tout) -->
+<script src="/app.js"></script>
+
+</body>
+</html>

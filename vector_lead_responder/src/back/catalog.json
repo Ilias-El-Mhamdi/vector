@@ -1,0 +1,81 @@
+{
+  "_aide": "Produits Vector France. Mots-cles insensibles a la casse, cherches dans le sujet ET le corps du mail. Un mail est un LEAD s'il mentionne au moins un produit.",
+
+  "products": [
+    {
+      "name": "CANalyzer",
+      "keywords": ["canalyzer", "can analyzer", "55100", "ma-55100"]
+    },
+    {
+      "name": "CANoe",
+      "keywords": ["canoe", "can oe", "55000", "ma-55000"]
+    },
+    {
+      "name": "CANdb++",
+      "keywords": ["candb", "candb++", "can db", "56100"]
+    },
+    {
+      "name": "CANape",
+      "keywords": ["canape", "can ape", "57100"]
+    },
+    {
+      "name": "vTESTstudio",
+      "keywords": ["vtestudio", "vtest studio", "vtest"]
+    },
+    {
+      "name": "VectorCAST",
+      "keywords": ["vectorcast", "vector cast"]
+    },
+    {
+      "name": "CANstress",
+      "keywords": ["canstress", "can stress"]
+    },
+    {
+      "name": "MICROSAR",
+      "keywords": ["microsar", "micro sar", "autosar"]
+    },
+    {
+      "name": "VN-Interface",
+      "keywords": ["vn1610", "vn1630", "vn1640", "vn5610", "vn5620", "vn7610", "vn7640", "vn interface", "vn-interface", "interface vector"]
+    }
+  ],
+
+  "options_globales": [
+    {
+      "name": "Licence perpetuelle",
+      "keywords": ["perpetual", "licence perpetuelle", "perpetuelle", "perpetual license"]
+    },
+    {
+      "name": "Maintenance",
+      "keywords": ["maintenance", "ma-", "maint.", "mise a jour", "update", "support annuel"]
+    },
+    {
+      "name": "ELA (Enterprise Licensing Agreement)",
+      "keywords": ["ela", "enterprise licensing", "enterprise license agreement", "ela 4800"]
+    },
+    {
+      "name": "Network License",
+      "keywords": ["network license", "network licens", "licence reseau", "reseau"]
+    },
+    {
+      "name": "Device License",
+      "keywords": ["device license", "device licens", "poste", "desktop edition"]
+    },
+    {
+      "name": "Formation",
+      "keywords": ["formation", "training", "tutoriel", "cours"]
+    },
+    {
+      "name": "Renouvellement maintenance",
+      "keywords": ["renouvellement", "renewal", "reconduction", "renouveler"]
+    }
+  ],
+
+  "replyTemplate": "Bonjour {{prenom}},\n\nNous vous remercions pour votre intérêt concernant {{produits}}.\n\nVeuillez trouver ci-joint notre offre commerciale correspondant à votre demande{{options_phrase}}.\n\n*** Veuillez envoyer votre bon de commande à adv@fr.vector.com en précisant votre numéro de devis{{quoteId}}***\n\nRestant à votre disposition pour toute demande de renseignements complémentaires,\n\n{{signature}}",
+
+  "replySubject": "Offre Commerciale Vector France - {{produits}}",
+
+  "templateAttachment": "",
+
+  "_ignoreSenders": ["noreply", "no-reply", "mailer-daemon", "newsletter", "notification", "donotreply", "do-not-reply", "vector-news", "vectornews"]
+}

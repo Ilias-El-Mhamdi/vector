@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier E-Mail PDF</title>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body style="margin:0;font-family:system-ui,sans-serif;background:#f0f2f5;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;box-sizing:border-box;">
+
+<div style="width:100%;max-width:680px;">
+  <div style="background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.1);padding:32px;">
+    <h1 style="margin:0 0 4px;font-size:20px;font-weight:700;color:#111;">Modifier l'e-mail dans un PDF</h1>
+    <p style="margin:0 0 28px;font-size:13px;color:#666;">Recouvre le champ E-Mail avec un rectangle blanc et écrit le nouvel e-mail.</p>
+
+    <!-- PDF input -->
+    <label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px;">Fichier PDF</label>
+    <div style="display:flex;gap:8px;align-items:stretch;margin-bottom:20px;">
+      <div id="dropZone" style="flex:1;border:2px dashed #d0d5dd;border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:10px;"
+           onclick="browseFile()"
+           ondragover="event.preventDefault();this.style.borderColor='#3b82f6'"
+           ondragleave="this.style.borderColor='#d0d5dd'"
+           ondrop="handleDrop(event)">
+        <svg width="16" height="16" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span id="dropLabel" style="font-size:13px;color:#888;flex:1;">Cliquez pour parcourir…</span>
+      </div>
+      <button onclick="browseFile()" style="padding:0 16px;background:#f8fafc;border:1px solid #d0d5dd;border-radius:8px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;white-space:nowrap;"
+        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+        Parcourir
+      </button>
+    </div>
+    <div id="pathHint" style="margin-top:-14px;margin-bottom:14px;font-size:11px;color:#9ca3af;padding-left:2px;display:flex;align-items:center;gap:8px;">
+      <span>Dossier : <span id="dirName" style="font-weight:600;color:#6b7280;">non défini</span></span>
+      <button id="btnDir" onclick="pickDefaultDir()" style="padding:2px 8px;font-size:11px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;color:#374151;">
+        Définir bdd/quotes
+      </button>
+    </div>
+
+    <!-- Email input -->
+    <label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px;">Nouvel e-mail</label>
+    <input id="emailInput" type="email" placeholder="nouveau@exemple.com"
+      style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d0d5dd;border-radius:8px;font-size:14px;outline:none;margin-bottom:20px;"
+      onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#d0d5dd'">
+
+    <!-- Advanced coords (collapsed) -->
+    <details style="margin-bottom:20px;">
+      <summary style="font-size:13px;color:#666;cursor:pointer;user-select:none;">Réglage de position avancé</summary>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">X (gauche)</label>
+          <input id="posX" type="number" value="316" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Y (bas de page)</label>
+          <input id="posY" type="number" value="452" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Taille police</label>
+          <input id="fontSize" type="number" value="9" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Largeur cache</label>
+          <input id="bgW" type="number" value="200" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Hauteur cache</label>
+          <input id="bgH" type="number" value="13" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Page (1-based)</label>
+          <input id="pageNum" type="number" value="1" min="1" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d0d5dd;border-radius:6px;font-size:13px;">
+        </div>
+      </div>
+      <p style="font-size:11px;color:#999;margin:10px 0 0;">Coordonnées en points PDF (A4 = 595×842). Origine en bas à gauche.</p>
+    </details>
+
+    <!-- Action button -->
+    <button id="btn" onclick="run()"
+      style="width:100%;padding:12px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;"
+      onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+      Modifier et télécharger
+    </button>
+
+    <div id="status" style="margin-top:14px;font-size:13px;color:#666;min-height:20px;"></div>
+  </div>
+
+  <!-- Preview -->
+  <div id="previewWrap" style="display:none;margin-top:24px;background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.1);padding:24px;">
+    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:12px;">Aperçu — page 1 (original)</div>
+    <canvas id="preview" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;"></canvas>
+  </div>
+</div>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  let pdfBytes = null;
+
+  // ── IndexedDB helpers for persisting the last FileSystemFileHandle ──
+  const DB_NAME = 'pdf-email-editor', DB_STORE = 'handles', DB_KEY_DIR = 'defaultDir';
+
+  function openDb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(DB_STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror   = () => rej(r.error);
+    });
+  }
+  async function saveDbKey(key, value) {
+    const db = await openDb();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(value, key);
+      tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function loadDbKey(key) {
+    const db = await openDb();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const r  = tx.objectStore(DB_STORE).get(key);
+      r.onsuccess = () => res(r.result || null);
+      r.onerror   = () => rej(r.error);
+    });
+  }
+
+  // ── Pick & save the default directory (run once) ──
+  async function pickDefaultDir() {
+    if (!window.showDirectoryPicker) { alert('Non supporté sur ce navigateur.'); return; }
+    try {
+      const dir = await window.showDirectoryPicker({ mode: 'read' });
+      await saveDbKey(DB_KEY_DIR, dir);
+      document.getElementById('dirName').textContent = dir.name;
+      document.getElementById('dirName').style.color = '#22c55e';
+    } catch(e) {
+      if (e.name !== 'AbortError') console.error(e);
+    }
+  }
+
+  // Restore dir name on load
+  (async () => {
+    try {
+      const dir = await loadDbKey(DB_KEY_DIR);
+      if (dir) {
+        document.getElementById('dirName').textContent = dir.name;
+        document.getElementById('dirName').style.color = '#22c55e';
+      }
+    } catch(e) {}
+  })();
+
+  // ── File picker — startIn = stored directory ──
+  async function browseFile() {
+    if (!window.showOpenFilePicker) {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.pdf';
+      input.onchange = () => { if (input.files[0]) loadFile(input.files[0]); };
+      input.click(); return;
+    }
+    let startIn = null;
+    try { startIn = await loadDbKey(DB_KEY_DIR); } catch(e) {}
+
+    const opts = { types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }], multiple: false };
+    if (startIn) opts.startIn = startIn;
+
+    try {
+      const [handle] = await window.showOpenFilePicker(opts);
+      const file = await handle.getFile();
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) loadFile(file);
+    } catch(e) {
+      if (e.name !== 'AbortError') console.error(e);
+    }
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').style.borderColor = '#d0d5dd';
+    const file = e.dataTransfer.files[0];
+    if (file && (file.type === 'application/pdf' || file.name.endsWith('.pdf'))) loadFile(file);
+  }
+
+  async function loadFile(file) {
+    try {
+      const buffer = await file.arrayBuffer();
+      pdfBytes = new Uint8Array(buffer);
+      document.getElementById('dropLabel').textContent = '✓ ' + file.name;
+      document.getElementById('dropZone').style.borderColor = '#22c55e';
+      document.getElementById('status').textContent = '';
+      await renderPreview(pdfBytes);
+    } catch(e) {
+      document.getElementById('status').style.color = '#ef4444';
+      document.getElementById('status').textContent = 'Lecture du fichier impossible : ' + e.message;
+    }
+  }
+
+  async function renderPreview(bytes) {
+    const wrap = document.getElementById('previewWrap');
+    const canvas = document.getElementById('preview');
+    wrap.style.display = 'block';
+    const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+    const page = await pdf.getPage(1);
+    const vp = page.getViewport({ scale: 1.5 });
+    canvas.width = vp.width;
+    canvas.height = vp.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  }
+
+  async function run() {
+    const email = document.getElementById('emailInput').value.trim();
+    const status = document.getElementById('status');
+
+    if (!pdfBytes) { status.style.color = '#ef4444'; status.textContent = 'Veuillez sélectionner un fichier PDF.'; return; }
+    if (!email) { status.style.color = '#ef4444'; status.textContent = 'Veuillez entrer un e-mail.'; return; }
+
+    const x       = parseFloat(document.getElementById('posX').value);
+    const y       = parseFloat(document.getElementById('posY').value);
+    const size    = parseFloat(document.getElementById('fontSize').value);
+    const bgW     = parseFloat(document.getElementById('bgW').value);
+    const bgH     = parseFloat(document.getElementById('bgH').value);
+    const pageIdx = parseInt(document.getElementById('pageNum').value, 10) - 1;
+
+    status.style.color = '#666';
+    status.textContent = 'Modification en cours…';
+    document.getElementById('btn').disabled = true;
+
+    try {
+      const { PDFDocument, StandardFonts, rgb } = PDFLib;
+
+      const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+      const font   = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const pages  = pdfDoc.getPages();
+
+      if (pageIdx >= pages.length) throw new Error(`La page ${pageIdx + 1} n'existe pas dans ce PDF.`);
+      const page = pages[pageIdx];
+
+      // White rectangle to cover old email
+      page.drawRectangle({
+        x: x - 1,
+        y: y - 2,
+        width: bgW + 2,
+        height: bgH + 2,
+        color: rgb(1, 1, 1),
+        borderWidth: 0,
+      });
+
+      // New email text
+      page.drawText(email, {
+        x,
+        y,
+        size,
+        font,
+        color: rgb(0, 0, 0),
+      });
+
+      const modified = await pdfDoc.save();
+      console.log('pdf-lib save() →', modified?.length, 'bytes');
+
+      if (!modified || modified.length === 0) throw new Error('pdf-lib a produit un fichier vide (0 bytes)');
+
+      const origName = document.getElementById('dropLabel').textContent.replace('✓ ', '') || 'QUOTE_modified.pdf';
+      const safeEmail = email.replace(/@/g, '_at_').replace(/\./g, '-');
+      const outName = origName.startsWith('QUOTE_')
+        ? 'QUOTE_' + safeEmail + '_' + origName.slice('QUOTE_'.length).replace(/^[^_]*_/, '')
+        : origName;
+
+      // Blob partagé pour les deux chemins
+      const blob = new Blob([modified.buffer], { type: 'application/pdf' });
+
+      if (window.showSaveFilePicker) {
+        let startIn = null;
+        try { startIn = await loadDbKey(DB_KEY_DIR); } catch(e) {}
+        const saveOpts = {
+          suggestedName: outName,
+          types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+        };
+        if (startIn) saveOpts.startIn = startIn;
+        try {
+          const fileHandle = await window.showSaveFilePicker(saveOpts);
+          const writable = await fileHandle.createWritable();
+          try {
+            await writable.write(blob);
+            await writable.close();
+          } catch(writeErr) {
+            await writable.abort().catch(() => {});
+            throw writeErr;
+          }
+          status.style.color = '#22c55e';
+          status.textContent = `Sauvegardé : ${fileHandle.name} (${(blob.size/1024).toFixed(0)} Ko)`;
+          return;
+        } catch(e) {
+          if (e.name === 'AbortError') { status.textContent = ''; return; }
+          throw e; // remonte l'erreur réelle
+        }
+      }
+
+      // Fallback : téléchargement classique
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = outName; a.click();
+      URL.revokeObjectURL(url);
+      status.style.color = '#22c55e';
+      status.textContent = `PDF téléchargé (${(blob.size/1024).toFixed(0)} Ko) dans Téléchargements.`;
+    } catch (err) {
+      status.style.color = '#ef4444';
+      status.textContent = 'Erreur : ' + err.message;
+      console.error(err);
+    } finally {
+      document.getElementById('btn').disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
