@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# JetBrains IDE
+.idea/workspace.xml
+.idea/shelf/
+.idea/httpRequests/
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea
+
+# Claude Code
+.claude/settings.local.json
+
+# Données runtime
+bdd/
+
+# Variables d'environnement / secrets
+env.txt
+*.env
+
+# Archives
+*.zip
+
+# PDFs racine (devis lâchés à la racine)
+*.pdf
+
+# Logs PowerShell
+*.log
+
+# Docusaurus
+docs/node_modules/
+docs/build/
+docs/.docusaurus/
+docs/.cache-loader/

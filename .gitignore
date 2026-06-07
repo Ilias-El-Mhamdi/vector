@@ -1,0 +1,38 @@
+# Environment
+env.txt
+*.env
+.env*
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# PowerShell
+*.ps1xml
+
+# Memory / session files
+memory/
+plan/
