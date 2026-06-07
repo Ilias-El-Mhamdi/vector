@@ -33,6 +33,13 @@ desktop.ini
 # PowerShell
 *.ps1xml
 
+# Data runtime
+bdd/
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/
+
 # Memory / session files
 memory/
 plan/

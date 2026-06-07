@@ -20,7 +20,9 @@
 | `status` | string | Voir machine à états ci-dessous |
 | `products` | string[] | Noms des produits Vector détectés par `Catalog.ps1` |
 | `options` | string[] | Options détectées (par produit + `options_globales`) |
-| `replyDraft` | string | Texte de réponse édité dans l'UI (auto-sauvegardé) |
+| `replyDraft` | string | Texte de réponse client édité dans l'UI (auto-sauvegardé toutes les 800 ms) |
+| `quoteDraft` | string | Texte de la demande de devis interne édité dans l'UI (auto-sauvegardé) |
+| `quoteId` | string | Identifiant numérique extrait du nom de fichier PDF (`QUOTE_<id>_...pdf`), ou `""` |
 | `createdAt` | string | ISO 8601 |
 | `updatedAt` | string | ISO 8601, mis à jour à chaque `Write-Json` |
 
@@ -44,7 +46,7 @@ ignore  →  devis non demande  →  devis demande  →  devis recu  →  traite
 
 ## Réponse `/api/leads` — liste (subset)
 
-Retourné par `Get-AllLeads`. Champs **absents** : `body`, `replyDraft`, `entryId`, `createdAt`.
+Retourné par `Get-AllLeads`. Champs **absents** : `body`, `replyDraft`, `quoteDraft`, `entryId`, `createdAt`.
 
 | Champ | Type |
 |-------|------|

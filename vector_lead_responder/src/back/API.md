@@ -8,7 +8,11 @@ Toutes les routes sont préfixées `/api/`. Les paramètres d'URL sont des query
 
 ### `GET /api/catalog`
 Retourne le contenu de `catalog.json` (produits, options, destinataire devis, template de réponse…).  
-**Quand :** au démarrage de l'app (`app.js → loadLeads`), une seule fois, pour alimenter `CATALOG`.
+**Quand :** au démarrage de l'app (`app.js → loadCatalog`), une seule fois, pour alimenter `CATALOG`.
+
+### `GET /api/config`
+Retourne la configuration runtime issue de `env.txt` : `{ scanCount, anthropicApiKey, devisCreateurMail, replySignature }`.  
+**Quand :** `app.js → init()` — injecte la clé Anthropic dans `window._anthropicKey`, la signature dans `window._replySignature`, et préremplit le champ `scanCount`.
 
 ---
 
@@ -38,6 +42,10 @@ Re-lit `subject` et `body` depuis Outlook via `entryId`, met à jour le fichier 
 Cherche dans `bdd/quotes/` un PDF `QUOTE_*.pdf` dont l'e-mail extrait correspond au lead, le copie dans le dossier du lead et passe le statut à `devis recu`.  
 **Quand :** `quote-panel.js → tryMatchQuote` — appelé automatiquement à l'ouverture d'un lead sans devis, et manuellement via le bouton "🔍 Rechercher devis".
 
+### `POST /api/delete-quote?id=<id>`
+Supprime tous les PDF du dossier du lead, efface `hasQuote` / `quoteName` / `quoteId` dans le JSON, repasse le statut à `devis demande` si le lead était en `devis recu`.  
+**Quand :** `quote-panel.js` — bouton "🗑 Supprimer le devis".
+
 ### `POST /api/upload-quote?id=<id>[&replace=1]`
 **Body :** `{ filename, data }` — `data` est le PDF encodé en base64.  
 Écrit le PDF dans le dossier du lead, passe le statut à `devis recu` (sauf si déjà `traite`). `replace=1` supprime les PDF existants avant d'écrire.  
@@ -47,9 +55,13 @@ Cherche dans `bdd/quotes/` un PDF `QUOTE_*.pdf` dont l'e-mail extrait correspond
 
 ## Actions Outlook
 
+### `GET /api/outlook-status`
+Retourne `{ connected: bool }` — vérifie si le cache COM Outlook est actif et répond.  
+**Quand :** `atoms/outlook-guard.js → withOutlook()` avant chaque opération Outlook.
+
 ### `POST /api/connect-outlook`
 Force l'initialisation du client COM Outlook (cache interne).  
-**Quand :** `app.js` au démarrage si Outlook n'est pas encore connecté.
+**Quand :** `app.js → init()` au démarrage, avant tout autre appel Outlook.
 
 ### `POST /api/scan[?count=N]`
 Lit les `N` derniers mails de la boîte de réception (défaut 50), crée les leads manquants, détecte les pièces jointes `QUOTE_*.pdf` entrantes.  

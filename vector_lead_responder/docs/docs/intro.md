@@ -17,27 +17,39 @@ Application desktop **Windows uniquement** qui détecte des leads commerciaux da
 | HTTP | `TcpListener` custom, port **8731** |
 | Frontend | Vanilla JS — pas de framework, pas de bundler |
 | Données | Fichiers JSON dans `bdd/` |
+| IA | API Anthropic (Claude Haiku) — brouillons de réponse et de devis |
 
 ## Workflow
 
 ```
 Outlook inbox
      │
-     ▼  POST /api/scan
-Détection produits (catalog matching)
+     ▼  POST /api/connect-outlook (démarrage auto)
+Connexion COM Outlook établie
+     │
+     ▼  POST /api/scan?count=N
+Détection produits Vector (catalog matching)
      │
      ▼
 Lead créé → status: "devis non demande"
      │
-     ▼  POST /api/generate-quote
+     ▼  POST /api/generate-quote  (+ ✦ IA optionnel)
 Mail interne de demande de devis
+     │  status: "devis demande"
      │
-     ▼  (réception PDF)
+     ▼  upload PDF / match automatique
 status: "devis recu"
      │
-     ▼  POST /api/send
+     ▼  POST /api/send  (+ ✦ IA optionnel)
 Réponse client envoyée → status: "traite"
 ```
+
+## Configuration
+
+L'application se configure via deux fichiers **non versionnés** :
+
+- **`env.txt`** à la racine — clé Anthropic, email expéditeur des devis, signature, nombre de mails à scanner par défaut
+- **`src/back/catalog.json`** — liste des produits Vector à détecter, mots-clés, templates de mail
 
 ## Démarrage rapide
 

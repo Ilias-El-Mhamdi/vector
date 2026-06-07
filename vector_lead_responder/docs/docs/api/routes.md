@@ -93,7 +93,7 @@ Si `preview=1`, le mail est créé et affiché dans Outlook sans être envoyé.
 
 ```json
 {
-  "replyText": "Bonjour John,\n\nVeuillez trouver..."
+  "replyDraft": "Bonjour John,\n\nVeuillez trouver..."
 }
 ```
 

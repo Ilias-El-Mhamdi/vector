@@ -14,8 +14,6 @@ Application desktop Windows qui détecte des leads commerciaux dans Outlook et g
 
 Démarrage : double-cliquer `Lancer.cmd` (force STA). Ne pas lancer `server.ps1` directement depuis un shell IST/non-STA — les appels COM Outlook échoueront.
 
-**Windows Defender :** ajouter une exclusion sur le **dossier racine entier** (celui qui contient `Lancer.cmd`), pas seulement sur `bdd/`. Sans ça, Defender peut bloquer l'écriture des JSON ou la lecture des PJ.
-
 ---
 
 ## Backend — ordre de chargement (dot-source)
@@ -23,13 +21,13 @@ Démarrage : double-cliquer `Lancer.cmd` (force STA). Ne pas lancer `server.ps1`
 `server.ps1` charge les modules dans cet ordre exact. L'ordre compte : les modules suivants dépendent des variables définies par les précédents (notamment `$Root`, `$LeadsDir`, `$Port`).
 
 ```
-Config.ps1   → chemins ($Root, $BddDir, $LeadsDir, $QuotesDir, $CatalogPath), port
+Config.ps1   → chemins ($Root, $BddDir, $LeadsDir, $QuotesDir, $CatalogPath), port, chargement env.txt
 Json.ps1     → Read-Json, Write-Json, ConvertTo-Hashtable, ConvertTo-SafeName
 Catalog.ps1  → Get-Catalog, Find-Matches
-Outlook.ps1  → Get-Outlook (cache COM), Invoke-LeadRefresh
-Leads.ps1    → Get-AllLeads, Get-LeadDetail, Update-Lead, Get-LeadPath, Get-QuotesList, Invoke-ApplyMatches
+Outlook.ps1  → Get-Outlook (cache COM), Test-OutlookAlive, Invoke-LeadRefresh
+Leads.ps1    → Get-AllLeads, Get-LeadDetail, Update-Lead, Get-LeadPath, Get-QuotesList, Invoke-MatchQuote, Invoke-DeleteQuote
 Mail.ps1     → Invoke-Scan, Invoke-GenerateQuote, Invoke-Send
-Http.ps1     → New-JsonResponse, New-TextResponse, New-Response, Parse-Query, Read-HttpRequest
+Http.ps1     → New-JsonResponse, New-JsonArrayResponse, New-TextResponse, New-Response, Parse-Query, Read-HttpRequest
 Router.ps1   → Handle-Request, Invoke-CatalogRoutes, Invoke-LeadsRoutes, Invoke-MailRoutes, Invoke-FileRoutes
 Listener.ps1 → Start-LeadServer (boucle TcpListener principale)
 ```
@@ -119,4 +117,5 @@ L'API `/api/lead?id=...` retourne le **détail complet** + `hasQuote` (bool) + `
 | Élément | État | Action |
 |---------|------|--------|
 | `l.items[]{produit, quantite}` dans `lead-item.js` | Schéma futur, backend pas encore implémenté | Implémenter côté PS quand besoin |
-| Clé `claudeApiKey` dans `catalog.json` | À lire depuis `$env:ANTHROPIC_API_KEY` | Migration Config.ps1 |
+| `STATUS_LABELS` dans `badge.js` et `ALL_STATUSES` dans `mselect.js` | Dupliqués — doivent rester synchronisés manuellement | Créer `atoms/status.js` unique (voir `plan/maintenabilite.md` P2-C) |
+| Machine à états en string literals éparpillés | `Mail.ps1`, `Leads.ps1`, `badge.js`, `mselect.js` | Ajouter `$LEAD_STATUSES` dans `Config.ps1` (voir plan P1-E) |
